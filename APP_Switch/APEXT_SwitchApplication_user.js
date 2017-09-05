@@ -6,8 +6,7 @@
 
 // @compatible     chrome Works with Chrome and Tampermonkey
 
-// @include        http*://*/f?p=4000:4500*
-// @include        https://apex.oracle.com/pls/apex/f?p=4000:4500*
+// @include        http*://*/f?p=4000:4500:*
 
 // @version        0.0.1
 // ==/UserScript==
