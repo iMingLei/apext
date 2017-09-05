@@ -27,7 +27,7 @@ prompt APPLICATION 300 - APEX Extension
 -- Application Export:
 --   Application:     300
 --   Name:            APEX Extension
---   Date and Time:   22:13 星期日 9月 3, 2017
+--   Date and Time:   00:23 星期一 9月 4, 2017
 --   Exported By:     OOS_USER
 --   Flashback:       0
 --   Export Type:     Application Export
@@ -37,7 +37,7 @@ prompt APPLICATION 300 - APEX Extension
 
 -- Application Statistics:
 --   Pages:                      1
---     Items:                    8
+--     Items:                    9
 --     Regions:                  1
 --     Buttons:                  1
 --     Dynamic Actions:          7
@@ -85,7 +85,7 @@ wwv_flow_api.create_flow(
 ,p_alias=>nvl(wwv_flow_application_install.get_application_alias,'APEXT')
 ,p_page_view_logging=>'YES'
 ,p_page_protection_enabled_y_n=>'Y'
-,p_checksum_salt_last_reset=>'20170903221201'
+,p_checksum_salt_last_reset=>'20170904002021'
 ,p_bookmark_checksum_function=>'MD5'
 ,p_max_session_length_sec=>28800
 ,p_compatibility_mode=>'5.1'
@@ -113,7 +113,7 @@ wwv_flow_api.create_flow(
 ,p_csv_encoding=>'N'
 ,p_auto_time_zone=>'N'
 ,p_last_updated_by=>'OOS_USER'
-,p_last_upd_yyyymmddhh24miss=>'20170903221201'
+,p_last_upd_yyyymmddhh24miss=>'20170904002021'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_ui_type_name => null
 );
@@ -6071,7 +6071,7 @@ wwv_flow_api.create_page(
 ,p_rejoin_existing_sessions=>'N'
 ,p_cache_mode=>'NOCACHE'
 ,p_last_updated_by=>'OOS_USER'
-,p_last_upd_yyyymmddhh24miss=>'20170903221201'
+,p_last_upd_yyyymmddhh24miss=>'20170904002021'
 );
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(155996477473054162)
@@ -6091,7 +6091,7 @@ wwv_flow_api.create_page_plug(
 );
 wwv_flow_api.create_page_button(
  p_id=>wwv_flow_api.id(6101505083862)
-,p_button_sequence=>120
+,p_button_sequence=>130
 ,p_button_plug_id=>wwv_flow_api.id(155996477473054162)
 ,p_button_name=>'Go'
 ,p_button_static_id=>'btn_go'
@@ -6247,7 +6247,7 @@ wwv_flow_api.create_page_item(
 wwv_flow_api.create_page_item(
  p_id=>wwv_flow_api.id(54639213555160)
 ,p_name=>'G1_PAGE_STATUS'
-,p_item_sequence=>110
+,p_item_sequence=>120
 ,p_item_plug_id=>wwv_flow_api.id(155996477473054162)
 ,p_display_as=>'NATIVE_HIDDEN'
 ,p_attribute_01=>'Y'
@@ -6259,6 +6259,15 @@ wwv_flow_api.create_page_item(
 ,p_item_plug_id=>wwv_flow_api.id(155996477473054162)
 ,p_display_as=>'NATIVE_HIDDEN'
 ,p_attribute_01=>'N'
+);
+wwv_flow_api.create_page_item(
+ p_id=>wwv_flow_api.id(56182252555175)
+,p_name=>'G1_PAGE_LOCK'
+,p_item_sequence=>110
+,p_item_plug_id=>wwv_flow_api.id(155996477473054162)
+,p_item_default=>'0'
+,p_display_as=>'NATIVE_HIDDEN'
+,p_attribute_01=>'Y'
 );
 wwv_flow_api.create_page_da_event(
  p_id=>wwv_flow_api.id(10799590083886)
@@ -6428,8 +6437,8 @@ wwv_flow_api.create_page_da_action(
 ,p_affected_elements_type=>'ITEM'
 ,p_affected_elements=>'G1_PAGE'
 ,p_attribute_01=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'var obj = JSON.parse($v(''G1_PAGE_STATUS''));',
 'var i = setInterval(function() {',
-'    var obj = JSON.parse($v(''G1_PAGE_STATUS''));',
 '    if (obj.page_status.length) {',
 '        clearInterval(i);',
 '        $.each(obj.page_status, function(index, element) {',
@@ -6442,6 +6451,14 @@ wwv_flow_api.create_page_da_action(
 '                }',
 '            });',
 '        });',
+'        if ($v(''G1_APPLICATION'') == $v(''G0_APPID'') ) {',
+'            $s(''G1_PAGE_LOCK'',''1'');',
+'        }        ',
+'    } else if ($v(''G1_PAGE_STATUS'') != null && obj.page_status.length == 0) {',
+'        clearInterval(i);    ',
+'        if ($v(''G1_APPLICATION'') == $v(''G0_APPID'') ) {',
+'            $s(''G1_PAGE_LOCK'',''1'');',
+'        }   ',
 '    }',
 '}, 200);'))
 );
@@ -6477,18 +6494,19 @@ wwv_flow_api.create_page_da_action(
  p_id=>wwv_flow_api.id(55933948555173)
 ,p_event_id=>wwv_flow_api.id(55821860555172)
 ,p_event_result=>'TRUE'
-,p_action_sequence=>10
+,p_action_sequence=>20
 ,p_execute_on_page_init=>'N'
 ,p_action=>'NATIVE_JAVASCRIPT_CODE'
 ,p_affected_elements_type=>'ITEM'
 ,p_affected_elements=>'G1_PAGE'
 ,p_attribute_01=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'var i = setInterval(function() {',
-'    if ($(''#G1_PAGE option'').length > 1) {',
+'    if ($v(''G1_PAGE_LOCK'') == 1) {',
 '        clearInterval(i);',
 '        var t$ = $(''#G1_PAGE option[value="'' + $v(''G0_PAGEID'') + ''"]'');',
 '        t$.attr("disabled", true);',
 '        t$.text(''[Current] - '' + t$.text());',
+'        apex.item("G1_PAGE_LOCK").setValue("0");        ',
 '    }',
 '}, 200);'))
 );
