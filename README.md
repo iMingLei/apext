@@ -1,2 +1,2 @@
-# APEXT
-APEX exTension
+# apext
+APEX exTensions
